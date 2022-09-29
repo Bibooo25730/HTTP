@@ -9,16 +9,24 @@ router.use(function timeLog (req, res, next) {
  }) 
 
 
-router.get('/tes', function  (req, res) { 
-    console.log(1)
-     fs.readFile('../app/fs/a.txt',(err,data)=>{
+router.get('/test', function  (req, res) { 
+   let ifmodifiedsince =  req.headers['if-modified-since'];
+     fs.stat('../app/fs/a.txt',(err,data)=>{
         if(err){
             return console.error(err)
         }
-        console.log(data)
-        res.append('Cache-Control', 'max-age=10');
-        res.send(data)
         
+        // ifmodifiedsince 
+        console.log(ifmodifiedsince)
+        if(ifmodifiedsince === data.mtime.toGMTString()){
+            res.status(304);
+
+        }
+      // 最后保存的时间
+        console.log(data.mtime.toGMTString())
+        res.append('Last-Modified',data.mtime.toGMTString());
+    
+        res.send(data)
      })
 })  
 
